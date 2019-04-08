@@ -1,11 +1,46 @@
 ﻿namespace DropItemsMod
 {
+	using RoR2;
+	using RoR2.UI;
 	using SeikoML;
 	using UnityEngine;
 	using UnityEngine.EventSystems;
 	using UnityEngine.Networking;
-	using RoR2;
-	using RoR2.UI;
+
+	// TODO(kookehs): Turn this into a MonoBehavior and attach it to a GameObject.
+	public class DropItemsMod : IKookehsMod
+	{
+		public void OnStart()
+		{
+			Debug.Log("Loaded DropItemsMod");
+		}
+
+		public void OnUpdate()
+		{
+			if (Api.GetRun() == null) return;
+
+			foreach (ItemIcon itemIcon in Api.GetItemIcons())
+			{
+				if (itemIcon.GetComponent<DropItemHandler>() == null)
+				{
+					DropItemHandler dropItemHandler = itemIcon.transform.gameObject.AddComponent<DropItemHandler>();
+					dropItemHandler.ItemIndex = itemIcon.ItemIndex;
+					dropItemHandler.Inventory = itemIcon.rectTransform.parent.GetComponent<ItemInventoryDisplay>().Inventory;
+				}
+			}
+
+			foreach (EquipmentIcon equipmentIcon in Api.GetEquipmentIcons())
+			{
+				if (equipmentIcon.GetComponent<DropItemHandler>() == null)
+				{
+					if (equipmentIcon.targetEquipmentSlot == null || equipmentIcon.targetEquipmentSlot.equipmentIndex == EquipmentIndex.None) return;
+					DropItemHandler dropItemHandler = equipmentIcon.transform.gameObject.AddComponent<DropItemHandler>();
+					dropItemHandler.EquipmentIndex = equipmentIcon.targetEquipmentSlot.equipmentIndex;
+					dropItemHandler.Inventory = equipmentIcon.targetInventory;
+				}
+			}
+		}
+	}
 
 	public class DropItemHandler : MonoBehaviour, IPointerClickHandler
 	{
@@ -42,44 +77,6 @@
 			notification.GetDescription = () => $"{Language.GetString(nameToken)}";
 			Inventory.RemoveItem(ItemIndex, 1);
 			Resources.Load<SpawnCard>("SpawnCards/InteractableSpawnCard/iscLockbox").DoSpawn(transform.position, Quaternion.identity).GetComponent<ChestBehavior>().SetDropPickup(ItemIndex);
-		}
-	}
-
-	// TODO(kookehs): Turn this into a MonoBehavior and attach it to a GameObject.
-	public class DropItemsMod : IKookehsMod
-	{
-		public void OnStart()
-		{
-			Debug.Log("Loaded DropItemsMod");
-		}
-
-		public void OnUpdate()
-		{
-			if (Api.GetRun() == null) return;
-			ItemIcon[] itemIcons = Api.GetItemIcons();
-
-			foreach (ItemIcon itemIcon in itemIcons)
-			{
-				if (itemIcon.GetComponent<DropItemHandler>() == null)
-				{
-					DropItemHandler dropItemHandler = itemIcon.transform.gameObject.AddComponent<DropItemHandler>();
-					dropItemHandler.ItemIndex = itemIcon.ItemIndex;
-					dropItemHandler.Inventory = itemIcon.rectTransform.parent.GetComponent<ItemInventoryDisplay>().Inventory;
-				}
-			}
-
-			EquipmentIcon[] equipmentIcons = Api.GetEquipmentIcons();
-
-			foreach (EquipmentIcon equipmentIcon in equipmentIcons)
-			{
-				if (equipmentIcon.GetComponent<DropItemHandler>() == null)
-				{
-					if (equipmentIcon.targetEquipmentSlot == null || equipmentIcon.targetEquipmentSlot.equipmentIndex == EquipmentIndex.None) return;
-					DropItemHandler dropItemHandler = equipmentIcon.transform.gameObject.AddComponent<DropItemHandler>();
-					dropItemHandler.EquipmentIndex = equipmentIcon.targetEquipmentSlot.equipmentIndex;
-					dropItemHandler.Inventory = equipmentIcon.targetInventory;
-				}
-			}
 		}
 	}
 }

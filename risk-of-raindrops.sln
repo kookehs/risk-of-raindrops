@@ -5,6 +5,8 @@ VisualStudioVersion = 16.0.28729.10
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DropItems", "DropItems\DropItems.csproj", "{173153DB-9B8F-47A4-81B9-84DEB9E7E9A3}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StatsDisplay", "StatsDisplay\StatsDisplay.csproj", "{6636A1D4-59DB-4296-83F4-3C1B825B1A5A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{173153DB-9B8F-47A4-81B9-84DEB9E7E9A3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{173153DB-9B8F-47A4-81B9-84DEB9E7E9A3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{173153DB-9B8F-47A4-81B9-84DEB9E7E9A3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6636A1D4-59DB-4296-83F4-3C1B825B1A5A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6636A1D4-59DB-4296-83F4-3C1B825B1A5A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6636A1D4-59DB-4296-83F4-3C1B825B1A5A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6636A1D4-59DB-4296-83F4-3C1B825B1A5A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -22,7 +22,9 @@ Collection of mods for Risk of Rain 2 compatible with Seiko's Mod Loader.
 ## Installation
 
 [Official Seiko's Mod Loader](https://github.com/risk-of-thunder/SeikoML)
+
 [My fork of Seiko's Mod Loader](https://github.com/kookehs/SeikoML)
 
 Follow steps to for Seiko's Mod Loader to patch file.
+
 Add the mod's zip file to mods directory.

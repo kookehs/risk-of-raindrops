@@ -1,13 +1,28 @@
-# RiskOfRain2Mods
+# Risk of Raindrops
 
-## Stats Display Mod
-![Stats Display Mod](https://github.com/kookehs/RiskOfRain2Mods/blob/master/ror2-stats.png)
+Collection of mods for Risk of Rain 2 compatible with Seiko's Mod Loader.
 
-## [Download](https://github.com/kookehs/RiskOfRain2Mods/releases)
+  - DropItems
+  - StatsDisplay (not yet ported)
 
-## Install
-Directory: SteamLibrary\steamapps\common\Risk of Rain 2\Risk of Rain 2_Data\Managed
+# DropItems
 
-Backup your Assembly-CSharp.dll
+  - Drop items / equipment by click on their icon.
+  - Dropped items are put away in a Rusty Lockbox.
+  - There will be a notification that you dropped the item.
 
-Place the downloaded Assembly-CSharp.dll in the above directory
+![DropItemsMod](https://github.com/kookehs/risk-of-raindrops/blob/master/images/drop-items.png)
+
+# StatsDisplay
+
+  - Displays character stats through the objective tracker.
+
+![Stats Display Mod](https://github.com/kookehs/RiskOfRain2Mods/blob/master/images/stats-display.png)
+
+### Installation
+
+[Official Seiko's Mod Loader](https://github.com/risk-of-thunder/SeikoML)
+[My fork of Seiko's Mod Loader](https://github.com/kookehs/SeikoML)
+
+Follow steps to for Seiko's Mod Loader to patch file.
+Add the mod's zip file to mods directory.

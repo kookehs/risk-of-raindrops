@@ -3,7 +3,7 @@
 Collection of mods for Risk of Rain 2 compatible with Seiko's Mod Loader.
 
   - DropItems
-  - StatsDisplay (not yet ported)
+  - StatsDisplay
 
 # DropItems
 
@@ -15,14 +15,14 @@ Collection of mods for Risk of Rain 2 compatible with Seiko's Mod Loader.
 
 # StatsDisplay
 
-  - Displays character stats through the objective tracker.
+  - Displays character stats.
 
 ![Stats Display Mod](https://github.com/kookehs/RiskOfRain2Mods/blob/master/images/stats-display.png)
 
 ### Installation
 
-[Official Seiko's Mod Loader](https://github.com/risk-of-thunder/SeikoML)  
-[My fork of Seiko's Mod Loader](https://github.com/kookehs/SeikoML)  
+[Official Seiko's Mod Loader](https://github.com/risk-of-thunder/SeikoML)
+[My fork of Seiko's Mod Loader](https://github.com/kookehs/SeikoML)
 
-Follow steps to for Seiko's Mod Loader to patch file.  
+Follow steps to for Seiko's Mod Loader to patch file.
 Add the mod's zip file to mods directory.

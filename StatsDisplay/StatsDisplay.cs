@@ -49,9 +49,9 @@
 		public string GetCharacterStats()
 		{
 			StringBuilder sb = new StringBuilder();
-			sb.AppendLine($"Damage: {CharacterBody.damage}\t\t| Crit %: {CharacterBody.crit}");
-			sb.AppendLine($"Attack Speed: {CharacterBody.attackSpeed}\t| Move Speed: {CharacterBody.moveSpeed}");
-			sb.AppendLine($"Acceleration: {CharacterBody.acceleration}\t| Jump Count: {CharacterBody.maxJumpCount}");
+			sb.AppendLine($"Damage: {CharacterBody.damage}\t\tCrit %: {CharacterBody.crit}");
+			sb.AppendLine($"Attack Speed: {CharacterBody.attackSpeed}\tMove Speed: {CharacterBody.moveSpeed}");
+			sb.AppendLine($"Acceleration: {CharacterBody.acceleration}\tJump Count: {CharacterBody.maxJumpCount}");
 			return sb.ToString();
 		}
 	}

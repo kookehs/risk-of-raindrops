@@ -5,7 +5,7 @@ Collection of mods for Risk of Rain 2 compatible with Seiko's Mod Loader.
   - DropItems
   - StatsDisplay
 
-# DropItems
+## DropItems
 
   - Drop items / equipment by click on their icon.
   - Dropped items are put away in a Rusty Lockbox.
@@ -13,13 +13,13 @@ Collection of mods for Risk of Rain 2 compatible with Seiko's Mod Loader.
 
 ![DropItemsMod](https://github.com/kookehs/risk-of-raindrops/blob/master/images/drop-items.png)
 
-# StatsDisplay
+## StatsDisplay
 
   - Displays character stats.
 
 ![Stats Display Mod](https://github.com/kookehs/RiskOfRain2Mods/blob/master/images/stats-display.png)
 
-### Installation
+## Installation
 
 [Official Seiko's Mod Loader](https://github.com/risk-of-thunder/SeikoML)
 [My fork of Seiko's Mod Loader](https://github.com/kookehs/SeikoML)

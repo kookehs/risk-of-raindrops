@@ -9,7 +9,7 @@
       <HintPath>E:\SteamLibrary\steamapps\common\Risk of Rain 2\Risk of Rain 2_Data\Managed\Assembly-CSharp.dll</HintPath>
     </Reference>
     <Reference Include="SeikoML">
-      <HintPath>..\..\SeikoML\RoR2ModFramework\bin\Debug\netstandard2.0\SeikoML.dll</HintPath>
+      <HintPath>E:\SteamLibrary\steamapps\common\Risk of Rain 2\Risk of Rain 2_Data\Managed\SeikoML.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine">
       <HintPath>E:\SteamLibrary\steamapps\common\Risk of Rain 2\Risk of Rain 2_Data\Managed\UnityEngine.dll</HintPath>

@@ -1,28 +1,22 @@
 ﻿namespace StatsDisplay
 {
 	using RoR2;
-	using RoR2.UI;
 	using SeikoML;
 	using System.Text;
 	using UnityEngine;
+	using UnityEngine.SceneManagement;
 
-	public class StatsDisplayMod : IKookehsMod
+	public class StatsDisplayMod : ISeikoMod
 	{
+		public static GameObject RootObject { get; set; }
+		public static StatsDisplayHandler StatsDisplayHandler { get; set; }
+
 		public void OnStart()
 		{
+			RootObject = new GameObject("StatsDisplayMod");
+			Object.DontDestroyOnLoad(RootObject);
+			StatsDisplayHandler = RootObject.AddComponent<StatsDisplayHandler>();
 			Debug.Log("Loaded StatsDisplayMod");
-		}
-
-		public void OnUpdate()
-		{
-			if (Api.GetRun() == null) return;
-			HUD hud = Object.FindObjectOfType<HUD>();
-
-			if (hud.GetComponent<StatsDisplayHandler>() == null)
-			{
-				StatsDisplayHandler statsDisplayHandler = hud.gameObject.AddComponent<StatsDisplayHandler>();
-				statsDisplayHandler.CharacterBody = hud.localUserViewer.cachedBody;
-			}
 		}
 	}
 
@@ -31,27 +25,74 @@
 		public Api.Notification StatsDisplay { get; set; }
 		public CharacterBody CharacterBody { get; set; }
 
-		private void Awake()
+		private void Start()
 		{
-			if (StatsDisplay == null)
+			SceneManager.sceneUnloaded += OnSceneUnloaded;
+		}
+
+		private void Update()
+		{
+			LocalUser localUser = LocalUserManager.GetFirstLocalUser();
+
+			if (CharacterBody == null && localUser != null)
 			{
-				CharacterMaster characterMaster = FindObjectOfType<CharacterMaster>();
-				StatsDisplay = characterMaster.gameObject.AddComponent<Api.Notification>(); ;
-				StatsDisplay.transform.SetParent(characterMaster.GetBody().transform);
+				CharacterBody = localUser.cachedBody;
+			}
+
+			if (StatsDisplay == null && CharacterBody != null)
+			{
+				StatsDisplay = CharacterBody.gameObject.AddComponent<Api.Notification>();
+				StatsDisplay.transform.SetParent(CharacterBody.transform);
 				StatsDisplay.SetPosition(new Vector3((float)(Screen.width * 0.25), (float)(Screen.height * 0.25), 0));
 				StatsDisplay.GetTitle = () => "STATS";
 				StatsDisplay.GetDescription = GetCharacterStats;
 				StatsDisplay.GenericNotification.fadeTime = 1f;
 				StatsDisplay.GenericNotification.duration = 1800f;
 			}
+
+			if (CharacterBody == null && StatsDisplay != null)
+			{
+				Destroy(StatsDisplay.RootObject);
+				Destroy(StatsDisplay.GenericNotification);
+				Destroy(StatsDisplay);
+			}
+
+			if (localUser != null && localUser.inputPlayer != null && localUser.inputPlayer.GetButton("info"))
+			{
+				if (StatsDisplay != null && StatsDisplay.RootObject != null)
+				{
+					StatsDisplay.RootObject.SetActive(true);
+				}
+			}
+			else
+			{
+				if (StatsDisplay != null && StatsDisplay.RootObject != null)
+				{
+					StatsDisplay.RootObject.SetActive(false);
+				}
+			}
+		}
+
+		private void OnSceneUnloaded(Scene scene)
+		{
+			CharacterBody = null;
+
+			if (StatsDisplay != null)
+			{
+				Destroy(StatsDisplay.RootObject);
+				Destroy(StatsDisplay.GenericNotification);
+				Destroy(StatsDisplay);
+			}
 		}
 
 		public string GetCharacterStats()
 		{
+			if (CharacterBody == null) return string.Empty;
+			// TODO(kookehs): Do the math for alignment.
 			StringBuilder sb = new StringBuilder();
-			sb.AppendLine($"Damage: {CharacterBody.damage}\t\tCrit %: {CharacterBody.crit}");
-			sb.AppendLine($"Attack Speed: {CharacterBody.attackSpeed}\tMove Speed: {CharacterBody.moveSpeed}");
-			sb.AppendLine($"Acceleration: {CharacterBody.acceleration}\tJump Count: {CharacterBody.maxJumpCount}");
+			sb.AppendLine($"Damage: {CharacterBody.damage}\t\tCrit: {CharacterBody.crit}%");
+			sb.AppendLine($"Attack Speed: {CharacterBody.attackSpeed}\t\tRegen: {CharacterBody.regen}");
+			sb.AppendLine($"Move Speed: {CharacterBody.moveSpeed}\t\tJump Count: {CharacterBody.maxJumpCount}");
 			return sb.ToString();
 		}
 	}

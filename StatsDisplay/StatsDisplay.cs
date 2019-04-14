@@ -1,98 +1,86 @@
 ﻿namespace StatsDisplay
 {
+	using BepInEx;
 	using RoR2;
-	using SeikoML;
 	using System.Text;
 	using UnityEngine;
 	using UnityEngine.SceneManagement;
 
-	public class StatsDisplayMod : ISeikoMod
-	{
-		public static GameObject RootObject { get; set; }
-		public static StatsDisplayHandler StatsDisplayHandler { get; set; }
+	[BepInPlugin("com.kookehs.statsdisplay", "StatsDisplay", "1.0")]
 
-		public void OnStart()
+	public class StatsDisplay : BaseUnityPlugin
+	{
+		public Notification Notification { get; set; }
+		public CharacterBody CachedCharacterBody { get; set; }
+
+		private void Awake()
 		{
-			RootObject = new GameObject("StatsDisplayMod");
-			Object.DontDestroyOnLoad(RootObject);
-			StatsDisplayHandler = RootObject.AddComponent<StatsDisplayHandler>();
 			Debug.Log("Loaded StatsDisplayMod");
-		}
-	}
-
-	public class StatsDisplayHandler : MonoBehaviour
-	{
-		public Api.Notification StatsDisplay { get; set; }
-		public CharacterBody CharacterBody { get; set; }
-
-		private void Start()
-		{
-			SceneManager.sceneUnloaded += OnSceneUnloaded;
 		}
 
 		private void Update()
 		{
 			LocalUser localUser = LocalUserManager.GetFirstLocalUser();
 
-			if (CharacterBody == null && localUser != null)
+			if (CachedCharacterBody == null && localUser != null)
 			{
-				CharacterBody = localUser.cachedBody;
+				CachedCharacterBody = localUser.cachedBody;
 			}
 
-			if (StatsDisplay == null && CharacterBody != null)
+			if (Notification == null && CachedCharacterBody != null)
 			{
-				StatsDisplay = CharacterBody.gameObject.AddComponent<Api.Notification>();
-				StatsDisplay.transform.SetParent(CharacterBody.transform);
-				StatsDisplay.SetPosition(new Vector3((float)(Screen.width * 0.25), (float)(Screen.height * 0.25), 0));
-				StatsDisplay.GetTitle = () => "STATS";
-				StatsDisplay.GetDescription = GetCharacterStats;
-				StatsDisplay.GenericNotification.fadeTime = 1f;
-				StatsDisplay.GenericNotification.duration = 1800f;
+				Notification = CachedCharacterBody.gameObject.AddComponent<Notification>();
+				Notification.transform.SetParent(CachedCharacterBody.transform);
+				Notification.SetPosition(new Vector3((float)(Screen.width * 0.25), (float)(Screen.height * 0.25), 0));
+				Notification.GetTitle = () => "STATS";
+				Notification.GetDescription = GetCharacterStats;
+				Notification.GenericNotification.fadeTime = 1f;
+				Notification.GenericNotification.duration = 86400f;
+				Notification.SetSize(float.NaN, 150f);
 			}
 
-			if (CharacterBody == null && StatsDisplay != null)
+			if (CachedCharacterBody == null && Notification != null)
 			{
-				Destroy(StatsDisplay.RootObject);
-				Destroy(StatsDisplay.GenericNotification);
-				Destroy(StatsDisplay);
+				Destroy(Notification);
 			}
 
 			if (localUser != null && localUser.inputPlayer != null && localUser.inputPlayer.GetButton("info"))
 			{
-				if (StatsDisplay != null && StatsDisplay.RootObject != null)
+				if (Notification != null && Notification.RootObject != null)
 				{
-					StatsDisplay.RootObject.SetActive(true);
+					Notification.RootObject.SetActive(true);
 				}
 			}
 			else
 			{
-				if (StatsDisplay != null && StatsDisplay.RootObject != null)
+				if (Notification != null && Notification.RootObject != null)
 				{
-					StatsDisplay.RootObject.SetActive(false);
+					Notification.RootObject.SetActive(false);
 				}
 			}
 		}
 
 		private void OnSceneUnloaded(Scene scene)
 		{
-			CharacterBody = null;
+			CachedCharacterBody = null;
 
-			if (StatsDisplay != null)
+			if (Notification != null)
 			{
-				Destroy(StatsDisplay.RootObject);
-				Destroy(StatsDisplay.GenericNotification);
-				Destroy(StatsDisplay);
+				Destroy(Notification);
 			}
 		}
 
 		public string GetCharacterStats()
 		{
-			if (CharacterBody == null) return string.Empty;
-			// TODO(kookehs): Do the math for alignment.
+			if (CachedCharacterBody == null) return string.Empty;
+			// TODO(kookehs): Use BepInEx config for customization.
 			StringBuilder sb = new StringBuilder();
-			sb.AppendLine($"Damage: {CharacterBody.damage}\t\tCrit: {CharacterBody.crit}%");
-			sb.AppendLine($"Attack Speed: {CharacterBody.attackSpeed}\t\tRegen: {CharacterBody.regen}");
-			sb.AppendLine($"Move Speed: {CharacterBody.moveSpeed}\t\tJump Count: {CharacterBody.maxJumpCount}");
+			sb.AppendLine($"Crit: {CachedCharacterBody.crit}%");
+			sb.AppendLine($"Damage: {CachedCharacterBody.damage}");
+			sb.AppendLine($"Attack Speed: {CachedCharacterBody.attackSpeed}");
+			sb.AppendLine($"Regen: {CachedCharacterBody.regen}");
+			sb.AppendLine($"Move Speed: {CachedCharacterBody.moveSpeed}");
+			sb.AppendLine($"Jump Count: {CachedCharacterBody.maxJumpCount}");
 			return sb.ToString();
 		}
 	}

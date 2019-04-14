@@ -74,18 +74,20 @@
 		public EquipmentIndex EquipmentIndex { get; set; } = EquipmentIndex.None;
 		public ItemIndex ItemIndex { get; set; } = ItemIndex.None;
 		public Inventory Inventory { get; set; } = null;
-		public bool ItemDropped { get; set; } = false;
 
 		public void OnPointerClick(PointerEventData eventData)
 		{
+			// TODO(kookehs): Add multiplayer support.
 			if (!NetworkServer.active || Inventory == null) return;
 
-			if (ItemDropped)
+			int[] itemStacks = (int[])typeof(Inventory).GetField("itemStacks", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(Inventory);
+
+			if (itemStacks[(int)ItemIndex] <= 0)
 			{
+				Destroy(this);
 				return;
 			}
 
-			ItemDropped = true;
 			CharacterBody characterBody = Inventory.GetComponent<CharacterMaster>().GetBody();
 			Notification notification = characterBody.gameObject.AddComponent<Notification>();
 			notification.transform.SetParent(characterBody.transform);
@@ -100,7 +102,6 @@
 				notification.GetDescription = () => $"{Language.GetString(equipmentDef.nameToken)}";
 				Inventory.SetEquipmentIndex(EquipmentIndex.None);
 				PickupDropletController.CreatePickupDroplet(new PickupIndex(ItemIndex), transform.position, Vector3.up * 20f + transform.forward * 10f);
-				Destroy(this);
 				return;
 			}
 
@@ -110,7 +111,6 @@
 			notification.GetDescription = () => $"{Language.GetString(itemDef.nameToken)}";
 			Inventory.RemoveItem(ItemIndex, 1);
 			PickupDropletController.CreatePickupDroplet(new PickupIndex(ItemIndex), transform.position, Vector3.up * 20f + transform.forward * 10f);
-			Destroy(this);
 		}
 	}
 }

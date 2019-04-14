@@ -47,6 +47,10 @@ Width = 250
 Height = 250
 ```
 
+## Download
+  - [Stable Builds On Thunderstore](https://thunderstore.io/package/kookehs/)
+  - [Nightly Builds On GitHub](https://github.com/kookehs/risk-of-raindrops/releases)
+
 ## Installation
 
   - [Install BepInEx](https://thunderstore.io/package/bbepis/BepInExPack/)

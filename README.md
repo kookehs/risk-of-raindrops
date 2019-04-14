@@ -18,6 +18,35 @@ Collection of mods for Risk of Rain 2 compatible with BepInEx.
 
 ![Stats Display Mod](https://github.com/kookehs/RiskOfRain2Mods/blob/master/images/stats-display.png)
 
+### Configure
+
+Edit Risk of Rain 2/BepInEx/config/com.kookehs.statsdisplay.cfg
+
+```
+[Display]
+
+# Text to display for the title.
+Title = STATS
+
+# A comma-separated list of stats to display.
+StatsToDisplay = crit,damage,attackSpeed,armor,regen,moveSpeed,maxJumpCount,experience
+
+# A comma-separated list of names for the stats.
+StatsToDisplayNames = Crit,Damage,Attack Speed,Armor,Regen,Move Speed,Jump Count,Experience
+
+# The X position as percent of screen width of the stats display.
+X = 10
+
+# The Y position as percent of screen height of the stats display.
+Y = 35
+
+# The width of the stats display.
+Width = 250
+
+# The height of the stats display.
+Height = 250
+```
+
 ## Installation
 
   - [Install BepInEx](https://thunderstore.io/package/bbepis/BepInExPack/)

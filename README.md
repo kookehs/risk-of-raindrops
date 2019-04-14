@@ -15,6 +15,7 @@ Collection of mods for Risk of Rain 2 compatible with BepInEx.
 ## StatsDisplay
 
   - Displays character stats on the Info Screen.
+  - Configurable with properties on CharacterBody.
 
 ![Stats Display Mod](https://github.com/kookehs/RiskOfRain2Mods/blob/master/images/stats-display.png)
 
@@ -28,7 +29,7 @@ Edit Risk of Rain 2/BepInEx/config/com.kookehs.statsdisplay.cfg
 # Text to display for the title.
 Title = STATS
 
-# A comma-separated list of stats to display.
+# A comma-separated list of stats to display based on CharacterBody properties.
 StatsToDisplay = crit,damage,attackSpeed,armor,regen,moveSpeed,maxJumpCount,experience
 
 # A comma-separated list of names for the stats.

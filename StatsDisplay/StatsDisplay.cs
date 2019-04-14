@@ -40,7 +40,7 @@
 			Title = Config.Wrap("Display", "Title", "Text to display for the title.", defaultTitle);
 
 			const string defaultStats = "crit,damage,attackSpeed,armor,regen,moveSpeed,maxJumpCount,experience";
-			StatsToDisplay = Config.Wrap("Display", "StatsToDisplay", "A comma-separated list of stats to display.", defaultStats);
+			StatsToDisplay = Config.Wrap("Display", "StatsToDisplay", "A comma-separated list of stats to display based on CharacterBody properties.", defaultStats);
 			CachedStatsToDisplay = StatsToDisplay.Value.Split(',');
 
 			const string defaultStatsName = "Crit,Damage,Attack Speed,Armor,Regen,Move Speed,Jump Count,Experience";

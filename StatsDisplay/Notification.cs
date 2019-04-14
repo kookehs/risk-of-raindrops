@@ -63,6 +63,7 @@
 
 		public void SetSize(float x, float y)
 		{
+			// TODO(kookehs): Figure out how to auto-resize rect transform.
 			RectTransform rectTransform = GenericNotification.GetComponent<RectTransform>();
 			Vector2 size = rectTransform.sizeDelta;
 			

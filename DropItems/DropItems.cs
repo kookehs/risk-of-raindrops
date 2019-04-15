@@ -80,14 +80,6 @@
 			// TODO(kookehs): Add multiplayer support.
 			if (!NetworkServer.active || Inventory == null) return;
 
-			int[] itemStacks = (int[])typeof(Inventory).GetField("itemStacks", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(Inventory);
-
-			if (itemStacks[(int)ItemIndex] <= 0)
-			{
-				Destroy(this);
-				return;
-			}
-
 			CharacterBody characterBody = Inventory.GetComponent<CharacterMaster>().GetBody();
 			Notification notification = characterBody.gameObject.AddComponent<Notification>();
 			notification.transform.SetParent(characterBody.transform);
@@ -101,7 +93,8 @@
 				notification.GetTitle = () => "Equipment dropped";
 				notification.GetDescription = () => $"{Language.GetString(equipmentDef.nameToken)}";
 				Inventory.SetEquipmentIndex(EquipmentIndex.None);
-				PickupDropletController.CreatePickupDroplet(new PickupIndex(ItemIndex), transform.position, Vector3.up * 20f + transform.forward * 10f);
+				PickupDropletController.CreatePickupDroplet(new PickupIndex(EquipmentIndex), transform.position, Vector3.up * 20f + transform.forward * 10f);
+				Destroy(this);
 				return;
 			}
 
@@ -111,6 +104,12 @@
 			notification.GetDescription = () => $"{Language.GetString(itemDef.nameToken)}";
 			Inventory.RemoveItem(ItemIndex, 1);
 			PickupDropletController.CreatePickupDroplet(new PickupIndex(ItemIndex), transform.position, Vector3.up * 20f + transform.forward * 10f);
+			int[] itemStacks = (int[])typeof(Inventory).GetField("itemStacks", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(Inventory);
+
+			if (itemStacks[(int)ItemIndex] <= 0)
+			{
+				Destroy(this);
+			}
 		}
 	}
 }

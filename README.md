@@ -19,6 +19,15 @@ Collection of mods for Risk of Rain 2 compatible with BepInEx.
 
 ![Stats Display Mod](https://github.com/kookehs/RiskOfRain2Mods/blob/master/images/stats-display.png)
 
+## Download
+  - [Stable Builds On Thunderstore](https://thunderstore.io/package/kookehs/)
+  - [Nightly Builds On GitHub](https://github.com/kookehs/risk-of-raindrops/releases)
+
+## Installation
+
+  - [Install BepInEx](https://thunderstore.io/package/bbepis/BepInExPack/)
+  - Place DLLs in Risk of Rain 2/BepInEx/plugins
+
 ### Configure
 
 Edit Risk of Rain 2/BepInEx/config/com.kookehs.statsdisplay.cfg
@@ -35,6 +44,12 @@ StatsToDisplay = crit,damage,attackSpeed,armor,regen,moveSpeed,maxJumpCount,expe
 # A comma-separated list of names for the stats.
 StatsToDisplayNames = Crit,Damage,Attack Speed,Armor,Regen,Move Speed,Jump Count,Experience
 
+# The font size of the title.
+TitleFontSize = 18
+
+# The font size of the description.
+DescriptionFontSize = 14
+
 # The X position as percent of screen width of the stats display.
 X = 10
 
@@ -47,18 +62,48 @@ Width = 250
 # The height of the stats display.
 Height = 250
 
-# The font size of the title.
-TitleFontSize = 18
-
-# The font size of the description
-DescriptionFontSize = 14
+# Whether the stats display always shows or only on Info Screen.
+Persistent = false
 ```
 
-## Download
-  - [Stable Builds On Thunderstore](https://thunderstore.io/package/kookehs/)
-  - [Nightly Builds On GitHub](https://github.com/kookehs/risk-of-raindrops/releases)
+Available properties on CharacterBody
 
-## Installation
-
-  - [Install BepInEx](https://thunderstore.io/package/bbepis/BepInExPack/)
-  - Place DLLs in Risk of Rain 2/BepInEx/plugins
+  - master
+  - inventory
+  - isPlayerControlled
+  - masterObject
+  - teamComponent
+  - healthComponent
+  - equipmentSlot
+  - modelLocator
+  - hurtBoxGroup
+  - mainHurtBox
+  - coreTransform
+  - isSprinting
+  - outOfDanger
+  - experience
+  - level
+  - maxHealth
+  - regen
+  - maxShield
+  - moveSpeed
+  - acceleration
+  - jumpPower
+  - maxJumpCount
+  - maxJumpHeight
+  - damage
+  - attackSpeed
+  - crit
+  - armor
+  - critHeal
+  - shouldAim
+  - warCryReady
+  - bestFitRadius
+  - spreadBloomAngle
+  - multiKillCount
+  - corePosition
+  - footPosition
+  - radius
+  - aimOrigin
+  - isElite
+  - isBoss

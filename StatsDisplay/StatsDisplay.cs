@@ -16,6 +16,8 @@
 		public static ConfigWrapper<string> Title { get; private set; }
 		public static ConfigWrapper<string> StatsToDisplay { get; private set; }
 		public static ConfigWrapper<string> StatsToDisplayNames { get; private set; }
+		public static ConfigWrapper<string> TitleFontSize { get; private set; }
+		public static ConfigWrapper<string> DescriptionFontSize { get; private set; }
 		public static ConfigWrapper<string> X { get; private set; }
 		public static ConfigWrapper<string> Y { get; private set; }
 		public static ConfigWrapper<string> Width { get; private set; }
@@ -26,6 +28,8 @@
 		public CharacterBody CachedCharacterBody { get; set; }
 		public string[] CachedStatsToDisplay { get; set; }
 		public string[] CachedStatsToDisplayNames { get; set; }
+		public int CachedTitleFontSize { get; set; }
+		public int CachedDescriptionFontSize { get; set; }
 
 		public StatsDisplay()
 		{
@@ -47,10 +51,17 @@
 			StatsToDisplayNames = Config.Wrap("Display", "StatsToDisplayNames", "A comma-separated list of names for the stats.", defaultStatsName);
 			CachedStatsToDisplayNames = StatsToDisplayNames.Value.Split(',');
 
-			if (CachedStatsToDisplay.Length != CachedStatsToDisplayNames.Length)
-			{
-				Debug.Log("Length of StatsToDisplay and StatsToDisplayNames do not match.");
-			}
+			if (CachedStatsToDisplay.Length != CachedStatsToDisplayNames.Length) Debug.Log("Length of StatsToDisplay and StatsToDisplayNames do not match.");
+
+			const string defaultTitleFontSize = "18";
+			TitleFontSize = Config.Wrap("Display", "TitleFontSize", "The font size of the title.", defaultTitleFontSize);
+			if (!int.TryParse(TitleFontSize.Value, out int titleFontSize)) Debug.Log("Invalid font size for title");
+			CachedTitleFontSize = titleFontSize;
+
+			const string defaultDescriptionFontSize = "14";
+			DescriptionFontSize = Config.Wrap("Display", "DescriptionFontSize", "The font size of the description", defaultDescriptionFontSize);
+			if (!int.TryParse(DescriptionFontSize.Value, out int descriptionFontSize)) Debug.Log("Invalid font size for description");
+			CachedDescriptionFontSize = descriptionFontSize;
 
 			const string defaultX = "10";
 			X = Config.Wrap("Display", "X", "The X position as percent of screen width of the stats display.", defaultX);
@@ -95,6 +106,8 @@
 				Notification.GenericNotification.fadeTime = 1f;
 				Notification.GenericNotification.duration = 86400f;
 				Notification.SetSize(Rect.width, Rect.height);
+				Notification.SetFontSize(Notification.GenericNotification.titleText, CachedTitleFontSize);
+				Notification.SetFontSize(Notification.GenericNotification.descriptionText, CachedDescriptionFontSize);
 			}
 
 			if (CachedCharacterBody == null && Notification != null)

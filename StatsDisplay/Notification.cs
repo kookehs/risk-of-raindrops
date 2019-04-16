@@ -4,7 +4,9 @@
 	using RoR2.UI;
 	using System;
 	using System.Reflection;
+	using TMPro;
 	using UnityEngine;
+	using UnityEngine.UI;
 
 	public class Notification : MonoBehaviour
 	{
@@ -13,6 +15,19 @@
 		public Func<string> GetTitle { get; set; }
 		public Func<string> GetDescription { get; set; }
 		public Transform Parent { get; set; }
+
+		public static void SetFontSize(LanguageTextMeshController languageTextMeshController, int fontSize)
+		{
+			Text text = (Text)typeof(LanguageTextMeshController).GetField("text", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(languageTextMeshController);
+			TextMesh textMesh = (TextMesh)typeof(LanguageTextMeshController).GetField("textMesh", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(languageTextMeshController);
+			TextMeshPro textMeshPro = (TextMeshPro)typeof(LanguageTextMeshController).GetField("textMeshPro", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(languageTextMeshController);
+			TextMeshProUGUI textMeshProUGui = (TextMeshProUGUI)typeof(LanguageTextMeshController).GetField("textMeshProUGui", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(languageTextMeshController);
+
+			if (text) text.fontSize = fontSize;
+			if (textMesh) textMesh.fontSize = fontSize;
+			if (textMeshPro) textMeshPro.fontSize = fontSize;
+			if (textMeshProUGui) textMeshProUGui.fontSize = fontSize;
+		}
 
 		private void Awake()
 		{

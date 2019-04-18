@@ -86,6 +86,7 @@ Available properties on CharacterBody
 | radius | aimOrigin | isElite | isBoss |  |
 
 Available fields on StatDef
+
 ||||||
 | --- | --- | --- | --- | --- |
 | totalGamesPlayed | totalTimeAlive | totalKills | totalDeaths | totalDamageDealt |

@@ -10,7 +10,7 @@
 	using UnityEngine.SceneManagement;
 	using UnityEngine.Networking;
 
-	[BepInPlugin("com.kookehs.dropitems", "DropItems", "1.1")]
+	[BepInPlugin("com.kookehs.dropitems", "DropItems", "1.1.1")]
 
 	public class DropItems : BaseUnityPlugin
 	{

@@ -161,6 +161,8 @@
 			if (!NetworkServer.active || Inventory == null || ShouldDestroy) return;
 
 			CharacterBody characterBody = Inventory.GetComponent<CharacterMaster>().GetBody();
+			if (characterBody == null || characterBody.healthComponent == null || characterBody.healthComponent.alive == false) return;
+
 			Notification notification = characterBody.gameObject.AddComponent<Notification>();
 			notification.transform.SetParent(characterBody.transform);
 			notification.SetPosition(new Vector3((float)(Screen.width * 0.8), (float)(Screen.height * 0.25), 0));

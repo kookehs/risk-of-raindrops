@@ -9,13 +9,15 @@
 	using UnityEngine;
 	using UnityEngine.SceneManagement;
 
-	[BepInPlugin("com.kookehs.statsdisplay", "StatsDisplay", "1.2")]
+	[BepInPlugin("com.kookehs.statsdisplay", "StatsDisplay", "1.3")]
 
 	public class StatsDisplay : BaseUnityPlugin
 	{
 		public static ConfigWrapper<string> Title { get; private set; }
-		public static ConfigWrapper<string> StatsToDisplay { get; private set; }
-		public static ConfigWrapper<string> StatsToDisplayNames { get; private set; }
+		public static ConfigWrapper<string> CharacterBodyStats { get; private set; }
+		public static ConfigWrapper<string> CharacterBodyStatsNames { get; private set; }
+		public static ConfigWrapper<string> StatSheetStats { get; private set; }
+		public static ConfigWrapper<string> StatSheetStatsNames { get; private set; }
 		public static ConfigWrapper<int> TitleFontSize { get; private set; }
 		public static ConfigWrapper<int> DescriptionFontSize { get; private set; }
 		public static ConfigWrapper<int> X { get; private set; }
@@ -26,8 +28,10 @@
 
 		public Notification Notification { get; set; }
 		public CharacterBody CachedCharacterBody { get; set; }
-		public string[] CachedStatsToDisplay { get; set; }
-		public string[] CachedStatsToDisplayNames { get; set; }
+		public string[] CachedCharacterBodyStats { get; set; }
+		public string[] CachedCharacterBodyStatsNames { get; set; }
+		public string[] CachedStatSheetStats { get; set; }
+		public string[] CachedStatSheetStatsNames { get; set; }
 
 		public StatsDisplay()
 		{
@@ -41,15 +45,25 @@
 			const string defaultTitle = "STATS";
 			Title = Config.Wrap("Display", "Title", "Text to display for the title.", defaultTitle);
 
-			const string defaultStats = "crit,damage,attackSpeed,armor,regen,moveSpeed,maxJumpCount,experience";
-			StatsToDisplay = Config.Wrap("Display", "StatsToDisplay", "A comma-separated list of stats to display based on CharacterBody properties.", defaultStats);
-			CachedStatsToDisplay = StatsToDisplay.Value.Split(',');
+			const string defaultCharacterBodyStats = "crit,damage,attackSpeed,armor,regen,moveSpeed,maxJumpCount,experience";
+			CharacterBodyStats = Config.Wrap("Display", "CharacterBodyStats", "A comma-separated list of stats to display based on CharacterBody properties.", defaultCharacterBodyStats);
+			CachedCharacterBodyStats = CharacterBodyStats.Value.Split(',');
 
-			const string defaultStatsName = "Crit,Damage,Attack Speed,Armor,Regen,Move Speed,Jump Count,Experience";
-			StatsToDisplayNames = Config.Wrap("Display", "StatsToDisplayNames", "A comma-separated list of names for the stats.", defaultStatsName);
-			CachedStatsToDisplayNames = StatsToDisplayNames.Value.Split(',');
+			const string defaultCharacterBodyStatsNames = "Crit,Damage,Attack Speed,Armor,Regen,Move Speed,Jump Count,Experience";
+			CharacterBodyStatsNames = Config.Wrap("Display", "CharacterBodyStatsNames", "A comma-separated list of names for the CharacterBody stats.", defaultCharacterBodyStatsNames);
+			CachedCharacterBodyStatsNames = CharacterBodyStatsNames.Value.Split(',');
 
-			if (CachedStatsToDisplay.Length != CachedStatsToDisplayNames.Length) Debug.Log("Length of StatsToDisplay and StatsToDisplayNames do not match.");
+			if (CachedCharacterBodyStats.Length != CachedCharacterBodyStatsNames.Length) Debug.Log($"Length of {nameof(CharacterBodyStats)} and {nameof(CharacterBodyStatsNames)} do not match.");
+
+			const string defaultStatSheetStats = "totalKills,totalDamageDealt,goldCollected,totalStagesCompleted";
+			StatSheetStats = Config.Wrap("Display", "StatSheetStats", "A comma-separated list of stats to display based on StatSheet fields.", defaultStatSheetStats);
+			CachedStatSheetStats = StatSheetStats.Value.Split(',');
+
+			const string defaultStatSheetStatsNames = "Kills,Damage Dealt,Gold Collected,Stages Completed";
+			StatSheetStatsNames = Config.Wrap("Display", "StatSheetStatsNames", "A comma-separated list of names for the StatSheet stats.", defaultStatSheetStatsNames);
+			CachedStatSheetStatsNames = StatSheetStatsNames.Value.Split(',');
+
+			if (CachedStatSheetStats.Length != CachedStatSheetStatsNames.Length) Debug.Log($"Length of {nameof(StatSheetStats)} and {nameof(StatSheetStatsNames)} do not match.");
 
 			const int defaultTitleFontSize = 18;
 			TitleFontSize = Config.Wrap("Display", "TitleFontSize", "The font size of the title.", defaultTitleFontSize);
@@ -133,26 +147,32 @@
 			if (CachedCharacterBody == null) return string.Empty;
 			StringBuilder sb = new StringBuilder();
 
-			for (int i = 0; i < CachedStatsToDisplay.Length; i++)
+			for (int i = 0; i < CachedCharacterBodyStats.Length; i++)
 			{
-				object stat = typeof(CharacterBody).GetProperty(CachedStatsToDisplay[i],
+				object stat = typeof(CharacterBody).GetProperty(CachedCharacterBodyStats[i],
 					BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance).GetValue(CachedCharacterBody);
-				sb.AppendLine($"{CachedStatsToDisplayNames[i]}: {stat}");
+				sb.AppendLine($"{CachedCharacterBodyStatsNames[i]}: {stat}");
 			}
 
 			RunReport runReport = RunReport.Generate(Run.instance, GameResultType.Unknown);
+			RunReport.PlayerInfo playerInfo = null;
 
 			for (int i = 0; i < runReport.playerInfoCount; i++)
 			{
-				RunReport.PlayerInfo playerInfo = runReport.GetPlayerInfo(i);
-
-				if (playerInfo.isLocalPlayer)
+				if (runReport.GetPlayerInfo(i).isLocalPlayer)
 				{
-					sb.AppendLine($"Kills: {playerInfo.statSheet.GetStatValueULong(StatDef.totalKills)}");
-					sb.AppendLine($"Damage Dealt: {playerInfo.statSheet.GetStatValueULong(StatDef.totalDamageDealt)}");
-					sb.AppendLine($"Gold Collected: {playerInfo.statSheet.GetStatValueULong(StatDef.goldCollected)}");
-					sb.AppendLine($"Stages Completed: {playerInfo.statSheet.GetStatValueULong(StatDef.totalStagesCompleted)}");
+					playerInfo = runReport.GetPlayerInfo(i);
 					break;
+				}
+			}
+
+			if (playerInfo != null)
+			{
+				for (int i = 0; i < CachedStatSheetStats.Length; i++)
+				{
+					StatDef statDef = (StatDef)typeof(StatDef).GetField(CachedStatSheetStats[i],
+						BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static).GetValue(null);
+					sb.AppendLine($"{CachedStatSheetStatsNames[i]}: {playerInfo.statSheet.GetStatDisplayValue(statDef)}");
 				}
 			}
 

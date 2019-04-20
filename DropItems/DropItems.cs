@@ -10,7 +10,7 @@
 	using UnityEngine.SceneManagement;
 	using UnityEngine.Networking;
 
-	[BepInPlugin("com.kookehs.dropitems", "DropItems", "1.1.1")]
+	[BepInPlugin("com.kookehs.dropitems", "DropItems", "1.1.2")]
 
 	public class DropItems : BaseUnityPlugin
 	{
@@ -57,11 +57,10 @@
 					{
 						if (itemIcon != null && itemIcon.GetComponent<DropItemController>() == null)
 						{
-							DropItemController dropItemController = itemIcon.transform.gameObject.AddComponent<DropItemController>();
-							ItemIndex itemIndex = (ItemIndex)typeof(ItemIcon).GetField("itemIndex", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(itemIcon);
-							dropItemController.ItemIndex = itemIndex;
+							DropItemController dropItemController = itemIcon.gameObject.AddComponent<DropItemController>();
 							Inventory inventory = (Inventory)typeof(ItemInventoryDisplay).GetField("inventory", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(hud.itemInventoryDisplay);
 							dropItemController.Inventory = inventory;
+							dropItemController.ItemIcon = itemIcon;
 						}
 					}
 				}
@@ -73,10 +72,12 @@
 				{
 					if (equipmentIcon.targetInventory == null) continue;
 					EquipmentIndex equipmentIndex = (equipmentIcon.displayAlternateEquipment) ? equipmentIcon.targetInventory.alternateEquipmentIndex : equipmentIcon.targetInventory.currentEquipmentIndex;
-					if (equipmentIndex == EquipmentIndex.None) continue;
-					DropItemController dropItemController = equipmentIcon.transform.gameObject.AddComponent<DropItemController>();
-					dropItemController.EquipmentIndex = equipmentIndex;
-					dropItemController.Inventory = equipmentIcon.targetInventory;
+					if (equipmentIndex != EquipmentIndex.None)
+					{
+						DropItemController dropItemController = equipmentIcon.gameObject.AddComponent<DropItemController>();
+						dropItemController.Inventory = equipmentIcon.targetInventory;
+						dropItemController.EquipmentIcon = equipmentIcon;
+					}
 				}
 			}
 		}
@@ -107,11 +108,10 @@
 							{
 								if (itemIcon != null && itemIcon.GetComponent<DropItemController>() == null)
 								{
-									DropItemController dropItemController = itemIcon.transform.gameObject.AddComponent<DropItemController>();
-									ItemIndex itemIndex = (ItemIndex)typeof(ItemIcon).GetField("itemIndex", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(itemIcon);
-									dropItemController.ItemIndex = itemIndex;
+									DropItemController dropItemController = itemIcon.gameObject.AddComponent<DropItemController>();
 									Inventory inventory = (Inventory)typeof(ItemInventoryDisplay).GetField("inventory", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(scoreboardStrip.itemInventoryDisplay);
 									dropItemController.Inventory = inventory;
+									dropItemController.ItemIcon = itemIcon;
 								}
 							}
 						}
@@ -122,10 +122,13 @@
 						{
 							if (equipmentIcon.targetInventory == null) continue;
 							EquipmentIndex equipmentIndex = (equipmentIcon.displayAlternateEquipment) ? equipmentIcon.targetInventory.alternateEquipmentIndex : equipmentIcon.targetInventory.currentEquipmentIndex;
-							if (equipmentIndex == EquipmentIndex.None) continue;
-							DropItemController dropItemController = equipmentIcon.transform.gameObject.AddComponent<DropItemController>();
-							dropItemController.EquipmentIndex = equipmentIndex;
-							dropItemController.Inventory = equipmentIcon.targetInventory;
+
+							if (equipmentIndex != EquipmentIndex.None)
+							{
+								DropItemController dropItemController = equipmentIcon.gameObject.AddComponent<DropItemController>();
+								dropItemController.Inventory = equipmentIcon.targetInventory;
+								dropItemController.EquipmentIcon = equipmentIcon;
+							}
 						}
 					}
 				}
@@ -136,13 +139,14 @@
 	public class DropItemController : MonoBehaviour, IPointerClickHandler
 	{
 		public static List<DropItemController> InstancesList { get; set; } = new List<DropItemController>();
-		public EquipmentIndex EquipmentIndex { get; set; } = EquipmentIndex.None;
-		public ItemIndex ItemIndex { get; set; } = ItemIndex.None;
+		public static bool ShouldDestroy { get; set; }
 		public Inventory Inventory { get; set; } = null;
-		public bool ShouldDestroy { get; set; }
+		public ItemIcon ItemIcon { get; set; } = null;
+		public EquipmentIcon EquipmentIcon { get; set; } = null;
 
 		private void Awake()
 		{
+			// TODO(kookehs): Map instances of this to players.
 			InstancesList.Add(this);
 		}
 
@@ -150,61 +154,68 @@
 		{
 			if (ShouldDestroy)
 			{
-				InstancesList.Remove(this);
-				Destroy(this);
+				foreach (DropItemController dropItemController in InstancesList)
+				{
+					Destroy(dropItemController);
+				}
+
+				InstancesList.Clear();
+				ShouldDestroy = false;
 			}
 		}
 
 		public void OnPointerClick(PointerEventData eventData)
 		{
 			// TODO(kookehs): Add multiplayer support.
-			if (!NetworkServer.active || Inventory == null || ShouldDestroy) return;
+			if (!NetworkServer.active || ShouldDestroy) return;
 
 			CharacterBody characterBody = Inventory.GetComponent<CharacterMaster>().GetBody();
 			if (characterBody == null || characterBody.healthComponent == null || characterBody.healthComponent.alive == false) return;
+
+			if (Inventory == null || (ItemIcon == null && EquipmentIcon == null))
+			{
+				ShouldDestroy = true;
+				return;
+			}
 
 			Notification notification = characterBody.gameObject.AddComponent<Notification>();
 			notification.transform.SetParent(characterBody.transform);
 			notification.SetPosition(new Vector3((float)(Screen.width * 0.8), (float)(Screen.height * 0.25), 0));
 			Transform transform = characterBody.transform;
 
-			if (EquipmentIndex != EquipmentIndex.None)
+			if (EquipmentIcon != null)
 			{
-				EquipmentDef equipmentDef = EquipmentCatalog.GetEquipmentDef(EquipmentIndex);
-				notification.SetIcon(Resources.Load<Texture>(equipmentDef.pickupIconPath));
-				notification.GetTitle = () => "Equipment dropped";
-				notification.GetDescription = () => $"{Language.GetString(equipmentDef.nameToken)}";
-				Inventory.SetEquipmentIndex(EquipmentIndex.None);
-				PickupDropletController.CreatePickupDroplet(new PickupIndex(EquipmentIndex), transform.position, Vector3.up * 20f + transform.forward * 10f);
+				EquipmentIndex equipmentIndex = (EquipmentIcon.displayAlternateEquipment) ? EquipmentIcon.targetInventory.alternateEquipmentIndex : EquipmentIcon.targetInventory.currentEquipmentIndex;
 
-				foreach (DropItemController dropItemController in InstancesList)
+				if (equipmentIndex != EquipmentIndex.None)
 				{
-					if (dropItemController.EquipmentIndex == EquipmentIndex)
-					{
-						ShouldDestroy = true;
-					}
+					EquipmentDef equipmentDef = EquipmentCatalog.GetEquipmentDef(equipmentIndex);
+					notification.SetIcon(Resources.Load<Texture>(equipmentDef.pickupIconPath));
+					notification.GetTitle = () => "Equipment dropped";
+					notification.GetDescription = () => $"{Language.GetString(equipmentDef.nameToken)}";
+					Inventory.SetEquipmentIndex(EquipmentIndex.None);
+					PickupDropletController.CreatePickupDroplet(new PickupIndex(equipmentIndex), transform.position, Vector3.up * 20f + transform.forward * 10f);
+					ShouldDestroy = true;
+					return;
 				}
-
-				return;
 			}
 
-			ItemDef itemDef = ItemCatalog.GetItemDef(ItemIndex);
-			notification.SetIcon(Resources.Load<Texture>(itemDef.pickupIconPath));
-			notification.GetTitle = () => "Item dropped";
-			notification.GetDescription = () => $"{Language.GetString(itemDef.nameToken)}";
-			Inventory.RemoveItem(ItemIndex, 1);
-			PickupDropletController.CreatePickupDroplet(new PickupIndex(ItemIndex), transform.position, Vector3.up * 20f + transform.forward * 10f);
 			int[] itemStacks = (int[])typeof(Inventory).GetField("itemStacks", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(Inventory);
+			ItemIndex itemIndex = (ItemIndex)typeof(ItemIcon).GetField("itemIndex", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(ItemIcon);
 
-			if (itemStacks[(int)ItemIndex] <= 0)
+			if (itemStacks[(int)itemIndex] > 0)
 			{
-				foreach (DropItemController dropItemController in InstancesList)
-				{
-					if (dropItemController.ItemIndex == ItemIndex)
-					{
-						ShouldDestroy = true;
-					}
-				}
+				ItemDef itemDef = ItemCatalog.GetItemDef(itemIndex);
+				notification.SetIcon(Resources.Load<Texture>(itemDef.pickupIconPath));
+				notification.GetTitle = () => "Item dropped";
+				notification.GetDescription = () => $"{Language.GetString(itemDef.nameToken)}";
+				Inventory.RemoveItem(itemIndex, 1);
+				PickupDropletController.CreatePickupDroplet(new PickupIndex(itemIndex), transform.position, Vector3.up * 20f + transform.forward * 10f);
+			}
+
+			if (itemStacks[(int)itemIndex] <= 0)
+			{
+				ShouldDestroy = true;
 			}
 		}
 	}

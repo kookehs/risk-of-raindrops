@@ -9,8 +9,9 @@
 	using UnityEngine;
 	using UnityEngine.SceneManagement;
 
-	[BepInPlugin("com.kookehs.statsdisplay", "StatsDisplay", "1.3")]
-
+	[BepInDependency("com.bepis.r2api")]
+	[BepInDependency("com.frogtown.shared", BepInDependency.DependencyFlags.SoftDependency)]
+	[BepInPlugin("com.kookehs.statsdisplay", "StatsDisplay", "2.3.0")]
 	public class StatsDisplay : BaseUnityPlugin
 	{
 		public static ConfigWrapper<string> Title { get; private set; }
@@ -32,15 +33,23 @@
 		public string[] CachedCharacterBodyStatsNames { get; set; }
 		public string[] CachedStatSheetStats { get; set; }
 		public string[] CachedStatSheetStatsNames { get; set; }
+		public bool Enabled { get; set; }
 
 		public StatsDisplay()
 		{
 			// TODO(kookehs): Reload on edit.
+			Enabled = true;
+			FrogtownInterface.Init(this, this.Config);
 			Config.ConfigReloaded += OnConfigReloaded;
 			OnConfigReloaded(null, null);
 		}
 
 		private void OnConfigReloaded(object sender, System.EventArgs e)
+		{
+			ReloadFromConfig();
+		}
+
+		internal void ReloadFromConfig()
 		{
 			const string defaultTitle = "STATS";
 			Title = Config.Wrap("Display", "Title", "Text to display for the title.", defaultTitle);
@@ -85,15 +94,33 @@
 
 			const bool defaultPersistent = false;
 			Persistent = Config.Wrap("Display", "Persistent", "Whether the stats display always shows or only on Info Screen.", defaultPersistent);
+
+			if(Notification != null)
+			{
+				Debug.Log("Reloading notification box");
+				Destroy(Notification);
+				Notification = null;
+			}
 		}
 
 		private void Awake()
 		{
 			Debug.Log("Loaded StatsDisplayMod");
+
 		}
 
 		private void Update()
 		{
+			if (!Enabled)
+			{
+				if (Notification != null)
+				{
+					Destroy(Notification);
+					Notification = null;
+				}
+				return;
+			}
+
 			LocalUser localUser = LocalUserManager.GetFirstLocalUser();
 
 			if (CachedCharacterBody == null && localUser != null)

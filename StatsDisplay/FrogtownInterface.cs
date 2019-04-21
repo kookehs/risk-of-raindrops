@@ -359,7 +359,7 @@
 			bool change = false;
 			GUILayout.BeginHorizontal();
 			GUILayout.Label(new GUIContent(config.Definition.Key + ":  " + config.Value, config.Definition.Description), GUILayout.Width(225));
-			GUILayout.Label(min.ToString(), GUILayout.Width(25));
+			GUILayout.Label(min.ToString(), _alignRight, GUILayout.Width(25));
 			var newVal = (int)Mathf.Round(GUILayout.HorizontalSlider(config.Value, min, max, GUILayout.Width(300)));
 			GUILayout.Label(max.ToString(), GUILayout.Width(25));
 			if (newVal != config.Value)
